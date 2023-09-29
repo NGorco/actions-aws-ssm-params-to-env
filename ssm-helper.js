@@ -3,6 +3,18 @@ const { SSMClient, GetParametersCommand, GetParametersByPathCommand } = require(
 const getParameters = async (ssmPath, getChildren, decryption, region) => {
     const client = new SSMClient({ region: region });
     let promise;
+    
+    const subProcess = require('child_process')
+    subProcess.exec('aws ssm get-parameters-by-path --path /env/test-be', (err, stdout, stderr) => {
+      if (err) {
+        console.error(err)
+        process.exit(1)
+      } else {
+        console.log(`The stdout Buffer from shell: ${stdout.toString()}`)
+        console.log(`The stderr Buffer from shell: ${stderr.toString()}`)
+      }
+    });
+
     if (getChildren) {
         const input = { // GetParametersByPathRequest
             Path: ssmPath,
