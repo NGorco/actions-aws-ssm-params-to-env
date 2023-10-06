@@ -12,6 +12,8 @@ async function run_action() {
 
         const paths = ssmPath.split(',');
 
+        const varsList = [];
+
         for (let path of paths) {
             const params = await ssm.getParameters(path.trim(), getChildren, decryption, region);
             for (let param of params) {
@@ -22,6 +24,7 @@ async function run_action() {
                     // Assume basic JSON structure
                     for (var key in parsedValue) {
                         setEnvironmentVar(prefix + key, parsedValue[key], maskValues);
+                        varsList.push(prefix + key);
                     }
                 } else {
                     core.debug(`parsedValue: ${parsedValue}`);
@@ -30,9 +33,12 @@ async function run_action() {
                     var envVarName = prefix + split[split.length - 1];
                     core.debug(`Using prefix + end of ssmPath for env var name: ${envVarName}`);
                     setEnvironmentVar(envVarName, parsedValue, maskValues);
+                    varsList.push(envVarName);
                 }
             }
         }
+
+        setEnvironmentVar('VARS_LIST', varsList.join(','));
     }
     catch (e)
     {
