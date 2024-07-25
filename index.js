@@ -9,6 +9,8 @@ async function run_action() {
         const region = process.env.AWS_DEFAULT_REGION;
         const decryption = core.getInput('decryption') === 'true';
         const maskValues = core.getInput('mask-values') === 'true';
+        const exportVarsList = core.getInput('export-vars-list') === 'true';
+
 
         const paths = ssmPath.split(',');
 
@@ -38,7 +40,9 @@ async function run_action() {
             }
         }
 
-        setEnvironmentVar('VARS_LIST', varsList.join(','));
+        if (exportVarsList) {
+            setEnvironmentVar('VARS_LIST', varsList.join(','));
+        }
     }
     catch (e)
     {
